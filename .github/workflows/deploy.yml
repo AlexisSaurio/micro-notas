@@ -74,22 +74,34 @@ jobs:
         run: |
           echo "${{ secrets.EC2_KEY }}" > /tmp/ssh_key.pem
           chmod 600 /tmp/ssh_key.pem
+
       - name: Deploy to EC2
         env:
           DOCKER_IMAGE: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_DEFAULT_REGION }}.amazonaws.com/${{ secrets.ECR_REPOSITORY }}:${{ needs.build.outputs.version_tag }}
         run: |
           ssh -o StrictHostKeyChecking=no -i /tmp/ssh_key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST_DEV }} << EOF
-            aws ecr get-login-password --region ${{ secrets.AWS_DEFAULT_REGION }} | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_DEFAULT_REGION }}.amazonaws.com
-            docker pull $DOCKER_IMAGE
-            docker stop notas-app || true
-            docker rm notas-app || true
+            # 1. Prestarle las llaves de AWS al servidor EC2
+            export AWS_ACCESS_KEY_ID="${{ secrets.AWS_ACCESS_KEY_ID }}"
+            export AWS_SECRET_ACCESS_KEY="${{ secrets.AWS_SECRET_ACCESS_KEY }}"
+            export AWS_SESSION_TOKEN="${{ secrets.AWS_SESSION_TOKEN }}"
             
+            # 2. Iniciar sesión en ECR
+            aws ecr get-login-password --region ${{ secrets.AWS_DEFAULT_REGION }} | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_DEFAULT_REGION }}.amazonaws.com
+            
+            # 3. Descargar la imagen
+            docker pull $DOCKER_IMAGE
+            
+            # 4. Limpiar lo viejo
+            docker stop catalogos-app || true
+            docker rm catalogos-app || true
+            
+            # 5. Correr el contenedor
             docker run -d --name notas-app -p 8001:8000 \
               -e APP_ENV="produccion" \
               -e AWS_REGION="${{ secrets.AWS_DEFAULT_REGION }}" \
               -e AWS_ACCESS_KEY_ID="${{ secrets.AWS_ACCESS_KEY_ID }}" \
               -e AWS_SECRET_ACCESS_KEY="${{ secrets.AWS_SECRET_ACCESS_KEY }}" \
-              -e AWS_SESSION_TOKEN="${{ secrets.AWS_SESSION_TOKEN }}" \
               -e BUCKET_NAME="${{ secrets.S3_BUCKET_NAME }}" \
+              -e AWS_SESSION_TOKEN="${{ secrets.AWS_SESSION_TOKEN }}" \
               $DOCKER_IMAGE
           EOF

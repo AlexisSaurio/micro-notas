@@ -38,6 +38,8 @@ def generar_y_subir_pdf(nota, cliente):
     pdf.add_page()
     pdf.set_font("Arial", 'B', 16)
     pdf.cell(200, 10, txt="NOTA DE VENTA", ln=True, align='C')
+    pdf.set_font("Arial", 'B', 12)
+    pdf.cell(200, 10, txt=f"Folio: {nota['ID']}", ln=True, align='R')
     pdf.set_font("Arial", size=12)
     pdf.cell(200, 10, txt=f"Cliente: {cliente['Nombre']}", ln=True)
     pdf.cell(200, 10, txt=f"RFC: {cliente['RFC']}", ln=True)

@@ -106,7 +106,7 @@ async def crear_nota_venta(request: Request):
         tabla_notas.put_item(Item=nueva_nota)
         generar_y_subir_pdf(nueva_nota, nueva_nota['Cliente'])
         
-        url_descarga = f"http://localhost:8000/notas/descargar?folio={folio}"
+        url_descarga = f"http://54.210.188.228:8001/notas/descargar?folio={folio}"
         payload_correo = {
             "cliente_nombre": datos_cliente['Nombre'],
             "folio": folio,

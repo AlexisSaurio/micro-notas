@@ -92,8 +92,8 @@ jobs:
             docker pull $DOCKER_IMAGE
             
             # 4. Limpiar lo viejo
-            docker stop catalogos-app || true
-            docker rm catalogos-app || true
+            docker stop notas-app || true
+            docker rm notas-app || true
             
             # 5. Correr el contenedor
             docker run -d --name notas-app -p 8001:8000 \
@@ -101,7 +101,7 @@ jobs:
               -e AWS_REGION="${{ secrets.AWS_DEFAULT_REGION }}" \
               -e AWS_ACCESS_KEY_ID="${{ secrets.AWS_ACCESS_KEY_ID }}" \
               -e AWS_SECRET_ACCESS_KEY="${{ secrets.AWS_SECRET_ACCESS_KEY }}" \
-              -e BUCKET_NAME="${{ secrets.S3_BUCKET_NAME }}" \
+              -e BUCKET_NOMBRE="${{ secrets.S3_BUCKET_NAME }}" \
               -e AWS_SESSION_TOKEN="${{ secrets.AWS_SESSION_TOKEN }}" \
               $DOCKER_IMAGE
           EOF

@@ -13,8 +13,7 @@ load_dotenv()
 
 APP_ENV = os.getenv("APP_ENV", "local")
 AWS_REGION = os.getenv("AWS_REGION", "us-east-1")
-BUCKET_NOMBRE = os.getenv("BUCKET_NOMBRE")
-URL_NOTIFICACIONES = os.getenv("URL_NOTIFICACIONES", "http://localhost:8002")
+BUCKET_NOMBRE = os.getenv("BUCKET_NOMBRE") or os.getenv("S3_BUCKET_NAME") = os.getenv("URL_NOTIFICACIONES", "http://localhost:8002")
 
 dynamodb = boto3.resource('dynamodb', region_name=AWS_REGION)
 s3 = boto3.client('s3', region_name=AWS_REGION)

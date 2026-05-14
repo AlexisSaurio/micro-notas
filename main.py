@@ -13,7 +13,8 @@ load_dotenv()
 
 APP_ENV = os.getenv("APP_ENV", "local")
 AWS_REGION = os.getenv("AWS_REGION", "us-east-1")
-BUCKET_NOMBRE = os.getenv("BUCKET_NOMBRE") or os.getenv("S3_BUCKET_NAME") = os.getenv("URL_NOTIFICACIONES", "http://localhost:8002")
+BUCKET_NOMBRE = os.getenv("BUCKET_NOMBRE") or os.getenv("S3_BUCKET_NAME") 
+URL_NOTIFICACIONES = os.getenv("URL_NOTIFICACIONES", "http://localhost:8002")
 
 dynamodb = boto3.resource('dynamodb', region_name=AWS_REGION)
 s3 = boto3.client('s3', region_name=AWS_REGION)
@@ -105,7 +106,7 @@ async def crear_nota_venta(request: Request):
         tabla_notas.put_item(Item=nueva_nota)
         generar_y_subir_pdf(nueva_nota, nueva_nota['Cliente'])
         
-        url_descarga = f"http://54.210.188.228:8001/notas/descargar?folio={folio}"
+        url_descarga = f"http://localhost:8001/notas/descargar?folio={folio}"
         payload_correo = {
             "cliente_nombre": datos_cliente['Nombre'],
             "folio": folio,
